@@ -16,11 +16,16 @@ repositories {
 
 val firestoreVersion by extra("6.12.2")
 
+val logbackVersion by extra("1.2.3")
+val kotlinLoggingVersion by extra("1.7.9")
+
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     implementation("com.google.firebase:firebase-admin:$firestoreVersion")
 
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 }
 
 tasks {
