@@ -7,6 +7,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.cloud.FirestoreClient
 import mu.KotlinLogging
+import java.util.*
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {  }
@@ -46,13 +47,14 @@ fun main(args: Array<String>) {
 }
 
 private fun initializeFirestore(): Firestore {
-    val serviceAccount =
-        Thread.currentThread().contextClassLoader.getResourceAsStream("firestore-service-account-key.json")
-    val options = FirebaseOptions.Builder()
-        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-        .setDatabaseUrl("https://bridge-store.firebaseio.com")
-        .build()
-    FirebaseApp.initializeApp(options)
+    Thread.currentThread().contextClassLoader.getResourceAsStream("firestore-service-account-key.json").use {
+        val credentials = GoogleCredentials.fromStream(it)
+        val options = FirebaseOptions.Builder()
+            .setCredentials(credentials)
+            .setDatabaseUrl("https://bridge-store.firebaseio.com")
+            .build()
+        FirebaseApp.initializeApp(options)
+    }
 
     return FirestoreClient.getFirestore()
 }
