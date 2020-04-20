@@ -6,9 +6,20 @@ import com.google.cloud.firestore.Firestore
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.cloud.FirestoreClient
-import java.util.*
+import mu.KotlinLogging
+import kotlin.system.exitProcess
 
-fun main() {
+private val logger = KotlinLogging.logger {  }
+
+fun main(args: Array<String>) {
+    if (args.isEmpty()) {
+        System.err.println("Please provide an id")
+        exitProcess(1)
+    }
+
+    val id = args[0]
+    logger.info { "Started app with identifier $id" }
+
     val db = initializeFirestore()
     val scoresCollection = db.collection("scores")
 
