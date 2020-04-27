@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
     }
 
     val id = args[0]
-    logger.info { "Started app with identifier $id" }
+    logger.info { "Started server with identifier $id" }
 
     val db = initializeFirestore()
     val scoresCollection = db.collection("scores")
