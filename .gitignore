@@ -1,6 +1,7 @@
 #Output
 .gradle/
 build/
+functions/node_modules/
 
 # IntelliJ
 .idea/
