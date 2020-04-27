@@ -22,9 +22,8 @@ fun main(args: Array<String>) {
     logger.info { "Started server with identifier $id" }
 
     val db = initializeFirestore()
-    val scoresCollection = db.collection("scores")
 
-    scoresCollection.addSnapshotListener { snapshot, _ ->
+    db.collection("scores").addSnapshotListener { snapshot, _ ->
         val changes = snapshot?.documentChanges ?: return@addSnapshotListener
         changes.forEach { change ->
             when (change.type) {
@@ -40,7 +39,7 @@ fun main(args: Array<String>) {
         val score = scanner.nextInt()
         val data: Map<String, Any> = mapOf("score" to score)
 
-        scoresCollection
+        db.collection("scores")
             .document(UUID.randomUUID().toString())
             .set(data)
     }
