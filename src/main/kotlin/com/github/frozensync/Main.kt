@@ -1,6 +1,8 @@
 package com.github.frozensync
 
 import com.github.frozensync.persistence.firestore.FirestoreFactory
+import com.github.frozensync.raspberrypi.RaspberryPiRepositoryImpl
+import com.github.frozensync.raspberrypi.RaspberryPiServiceImpl
 import com.google.cloud.firestore.DocumentChange
 import mu.KotlinLogging
 import java.util.*
@@ -29,6 +31,10 @@ fun main(args: Array<String>) {
             }
         }
     }
+
+    val piRepository = RaspberryPiRepositoryImpl(db)
+    val piService = RaspberryPiServiceImpl(piRepository)
+    piService.register(UUID.fromString(id))
 
     val scanner = Scanner(System.`in`)
     while (true) {
