@@ -1,11 +1,7 @@
 package com.github.frozensync
 
-import com.google.auth.oauth2.GoogleCredentials
+import com.github.frozensync.persistence.firestore.FirestoreFactory
 import com.google.cloud.firestore.DocumentChange
-import com.google.cloud.firestore.Firestore
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
-import com.google.firebase.cloud.FirestoreClient
 import mu.KotlinLogging
 import java.util.*
 import kotlin.system.exitProcess
@@ -21,7 +17,7 @@ fun main(args: Array<String>) {
     val id = args[0]
     logger.info { "Started server with identifier $id" }
 
-    val db = initializeFirestore()
+    val db = FirestoreFactory.get()
 
     db.collection("scores").addSnapshotListener { snapshot, _ ->
         val changes = snapshot?.documentChanges ?: return@addSnapshotListener
@@ -43,17 +39,4 @@ fun main(args: Array<String>) {
             .document(UUID.randomUUID().toString())
             .set(data)
     }
-}
-
-private fun initializeFirestore(): Firestore {
-    Thread.currentThread().contextClassLoader.getResourceAsStream("firestore-service-account-key.json").use {
-        val credentials = GoogleCredentials.fromStream(it)
-        val options = FirebaseOptions.Builder()
-            .setCredentials(credentials)
-            .setDatabaseUrl("https://bridge-store.firebaseio.com")
-            .build()
-        FirebaseApp.initializeApp(options)
-    }
-
-    return FirestoreClient.getFirestore()
 }
