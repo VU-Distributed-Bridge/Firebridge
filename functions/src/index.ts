@@ -2,7 +2,6 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 admin.initializeApp()
-const firestore = admin.firestore
 
 // noinspection JSUnusedGlobalSymbols
 export const addScore = functions
@@ -14,38 +13,27 @@ export const addScore = functions
         if (typeof req.body.score !== "number") return res.sendStatus(400)
         const score = req.body.score as number
 
-        firestore().collection("tournamentAssignments").doc(raspberryPiId).get()
-            .then(doc => {
-                if (!doc.exists) {
-                    console.info(`Raspberry Pi with id ${raspberryPiId} is not assigned to any tournament.`);
-                    return;
-                }
-
-                console.info("Document data:", doc.data());
-                return doc.data()
-            })
-            .then(data => {
-                if (data == undefined) {
-                    console.error(`Malformed document ${raspberryPiId}: no field "tournamentId"`)
-                    return;
-                }
-
-                const docRef = firestore().collection("tournaments").doc(data.tournamentId)
-                    .collection("rooms").doc(raspberryPiId);
-                docRef.get()
-                    .then(doc => {
-                        if (doc.exists) {
-                            const data = {score: score}
-                            docRef.update(data)
-                                .then(() => console.info(`Added score ${data.score}`))
-                        } else {
-                            const data = {score: score}
-                            docRef.create(data)
-                                .then(() => console.info(`Created room with initial score ${data.score}`))
-                        }
-                    })
-            })
-            .catch(err => console.error(err));
+        save(raspberryPiId, {score: score}).catch(err => console.error(err))
 
         return res.sendStatus(202);
     });
+
+const firestore = admin.firestore
+
+const save = async (raspberryPiId: string, data: { score: number }) => {
+    const tournamentAssignmentDoc = await firestore().doc(`tournamentAssignments/${raspberryPiId}`).get()
+    if (!tournamentAssignmentDoc.exists) return console.info(`Raspberry pi (id=${raspberryPiId}) is not assigned to any tournament.`)
+
+    const tournamentId = tournamentAssignmentDoc.data()?.tournamentId
+    if (tournamentId === undefined) return console.error(`Malformed document ${raspberryPiId}: no field "tournamentId"`)
+
+    const tournamentRef = firestore().doc(`tournaments/${tournamentId}/rooms/${raspberryPiId}`)
+    const tournamentDoc = await tournamentRef.get()
+    if (tournamentDoc.exists) {
+        await tournamentRef.update(data)
+        console.info(`Added score ${data.score}`)
+    } else {
+        await tournamentRef.create(data)
+        console.info(`Created room with initial score ${data.score}`)
+    }
+}
