@@ -1,2 +1,2 @@
-rootProject.name = "bridge-data-store"
+rootProject.name = "firebridge"
 
