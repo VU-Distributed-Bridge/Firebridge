@@ -1,10 +1,10 @@
 package com.github.frozensync
 
-import com.github.frozensync.persistence.firestore.FirestoreFactory
-import com.github.frozensync.raspberrypi.RaspberryPiRepositoryImpl
-import com.github.frozensync.raspberrypi.RaspberryPiServiceImpl
-import com.google.cloud.firestore.DocumentChange
+import com.github.frozensync.persistence.firestore.firestoreModule
+import com.github.frozensync.raspberrypi.RaspberryPiService
+import com.github.frozensync.raspberrypi.raspberryPiModule
 import mu.KotlinLogging
+import org.koin.core.context.startKoin
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -12,37 +12,23 @@ private val logger = KotlinLogging.logger {  }
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
-        System.err.println("Please provide an id")
+        System.err.println("Please provide an id for the raspberry pi.")
         exitProcess(1)
     }
+    val id = UUID.fromString(args[0])
 
-    val id = args[0]
-    logger.info { "Started server with identifier $id" }
+    logger.info { "Started with id $id." }
 
-    val db = FirestoreFactory.get()
-
-    db.collection("scores").addSnapshotListener { snapshot, _ ->
-        val changes = snapshot?.documentChanges ?: return@addSnapshotListener
-        changes.forEach { change ->
-            when (change.type) {
-                DocumentChange.Type.ADDED -> println("New score: ${change.document.data}")
-                DocumentChange.Type.MODIFIED -> println("Modified score: ${change.document.data}")
-                DocumentChange.Type.REMOVED -> println("Removed score: ${change.document.data}")
-            }
-        }
+    val koinApplication = startKoin {
+        modules(firestoreModule, raspberryPiModule)
     }
+    val koin = koinApplication.koin
 
-    val piRepository = RaspberryPiRepositoryImpl(db)
-    val piService = RaspberryPiServiceImpl(piRepository)
-    piService.register(UUID.fromString(id))
+    val raspberryPiService = koin.get<RaspberryPiService>()
+    raspberryPiService.register(id)
 
     val scanner = Scanner(System.`in`)
     while (true) {
-        val score = scanner.nextInt()
-        val data: Map<String, Any> = mapOf("score" to score)
-
-        db.collection("scores")
-            .document(UUID.randomUUID().toString())
-            .set(data)
+        scanner.nextInt()
     }
 }
