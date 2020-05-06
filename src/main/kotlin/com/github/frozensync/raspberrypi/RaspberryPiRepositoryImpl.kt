@@ -3,7 +3,7 @@ package com.github.frozensync.raspberrypi
 import com.google.cloud.firestore.Firestore
 import mu.KotlinLogging
 
-const val RASPBERRY_PI_COLLECTION = "RaspberryPis"
+const val RASPBERRY_PI_COLLECTION = "raspberryPis"
 
 class RaspberryPiRepositoryImpl(private val db: Firestore) : RaspberryPiRepository {
 
