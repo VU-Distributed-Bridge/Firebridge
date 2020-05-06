@@ -1,10 +1,12 @@
 package com.github.frozensync
 
 import com.github.frozensync.persistence.firestore.FirestoreFactory
-import com.github.frozensync.raspberrypi.RaspberryPiRepositoryImpl
-import com.github.frozensync.raspberrypi.RaspberryPiServiceImpl
+import com.github.frozensync.persistence.firestore.firestoreModule
+import com.github.frozensync.raspberrypi.RaspberryPiService
+import com.github.frozensync.raspberrypi.raspberryPiModule
 import com.google.cloud.firestore.DocumentChange
 import mu.KotlinLogging
+import org.koin.core.context.startKoin
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -15,8 +17,8 @@ fun main(args: Array<String>) {
         System.err.println("Please provide an id")
         exitProcess(1)
     }
+    val id = UUID.fromString(args[0])
 
-    val id = args[0]
     logger.info { "Started server with identifier $id" }
 
     val db = FirestoreFactory.get()
@@ -32,9 +34,13 @@ fun main(args: Array<String>) {
         }
     }
 
-    val piRepository = RaspberryPiRepositoryImpl(db)
-    val piService = RaspberryPiServiceImpl(piRepository)
-    piService.register(UUID.fromString(id))
+    val koinApplication = startKoin {
+        modules(firestoreModule, raspberryPiModule)
+    }
+    val koin = koinApplication.koin
+
+    val raspberryPiService = koin.get<RaspberryPiService>()
+    raspberryPiService.register(id)
 
     val scanner = Scanner(System.`in`)
     while (true) {
