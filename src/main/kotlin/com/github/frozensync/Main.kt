@@ -1,10 +1,8 @@
 package com.github.frozensync
 
-import com.github.frozensync.persistence.firestore.FirestoreFactory
 import com.github.frozensync.persistence.firestore.firestoreModule
 import com.github.frozensync.raspberrypi.RaspberryPiService
 import com.github.frozensync.raspberrypi.raspberryPiModule
-import com.google.cloud.firestore.DocumentChange
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
 import java.util.*
@@ -21,19 +19,6 @@ fun main(args: Array<String>) {
 
     logger.info { "Started server with identifier $id" }
 
-    val db = FirestoreFactory.get()
-
-    db.collection("scores").addSnapshotListener { snapshot, _ ->
-        val changes = snapshot?.documentChanges ?: return@addSnapshotListener
-        changes.forEach { change ->
-            when (change.type) {
-                DocumentChange.Type.ADDED -> println("New score: ${change.document.data}")
-                DocumentChange.Type.MODIFIED -> println("Modified score: ${change.document.data}")
-                DocumentChange.Type.REMOVED -> println("Removed score: ${change.document.data}")
-            }
-        }
-    }
-
     val koinApplication = startKoin {
         modules(firestoreModule, raspberryPiModule)
     }
@@ -44,11 +29,6 @@ fun main(args: Array<String>) {
 
     val scanner = Scanner(System.`in`)
     while (true) {
-        val score = scanner.nextInt()
-        val data: Map<String, Any> = mapOf("score" to score)
-
-        db.collection("scores")
-            .document(UUID.randomUUID().toString())
-            .set(data)
+        scanner.nextInt()
     }
 }
