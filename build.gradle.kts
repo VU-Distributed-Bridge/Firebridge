@@ -13,9 +13,11 @@ application {
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 val firestoreVersion by extra("6.12.2")
+val koinVersion by extra("2.1.5")
 
 val logbackVersion by extra("1.2.3")
 val kotlinLoggingVersion by extra("1.7.9")
@@ -25,8 +27,12 @@ dependencies {
 
     implementation("com.google.firebase:firebase-admin:$firestoreVersion")
 
+    implementation("org.koin:koin-core:$koinVersion")
+
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+
+    testImplementation("org.koin:koin-test:$koinVersion")
 }
 
 tasks {
