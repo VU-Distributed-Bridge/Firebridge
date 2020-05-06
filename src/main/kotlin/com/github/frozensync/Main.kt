@@ -12,12 +12,12 @@ private val logger = KotlinLogging.logger {  }
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
-        System.err.println("Please provide an id")
+        System.err.println("Please provide an id for the raspberry pi.")
         exitProcess(1)
     }
     val id = UUID.fromString(args[0])
 
-    logger.info { "Started server with identifier $id" }
+    logger.info { "Started with id $id." }
 
     val koinApplication = startKoin {
         modules(firestoreModule, raspberryPiModule)
