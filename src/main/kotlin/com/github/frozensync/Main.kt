@@ -6,23 +6,27 @@ import com.github.frozensync.raspberrypi.raspberryPiModule
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 import kotlin.system.exitProcess
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger { }
 
-fun main(args: Array<String>) {
-    if (args.isEmpty()) {
-        System.err.println("Please provide an id for the raspberry pi.")
-        exitProcess(1)
-    }
-    val id = UUID.fromString(args[0])
-
-    logger.info { "Started with id $id." }
-
+fun main() {
     val koinApplication = startKoin {
         modules(firestoreModule, raspberryPiModule)
+        environmentProperties()
     }
     val koin = koinApplication.koin
+
+    val idProperty = koin.getProperty<String>("RASPBERRY_PI_ID")
+    if (idProperty == null) {
+        System.err.println("Please provide an id for the raspberry pi as an environment variable.")
+        exitProcess(1)
+    }
+    val id = UUID.fromString(idProperty)
+
+    logger.info { "Started with id $id." }
+    fixedRateTimer(name = "health-check", daemon = true, period = 20000L) { logger.info { "Health check: OK" } }
 
     val raspberryPiService = koin.get<RaspberryPiService>()
     raspberryPiService.register(id)
