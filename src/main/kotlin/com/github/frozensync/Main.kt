@@ -6,6 +6,7 @@ import com.github.frozensync.raspberrypi.raspberryPiModule
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
@@ -25,6 +26,7 @@ fun main() {
     val id = UUID.fromString(idProperty)
 
     logger.info { "Started with id $id." }
+    fixedRateTimer(name = "health-check", daemon = true, period = 20000L) { logger.info { "Health check: OK" } }
 
     val raspberryPiService = koin.get<RaspberryPiService>()
     raspberryPiService.register(id)
