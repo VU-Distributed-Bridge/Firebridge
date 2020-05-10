@@ -17,12 +17,13 @@ fun main(args: Array<String>) {
     }
     val id = UUID.fromString(args[0])
 
-    logger.info { "Started with id $id." }
-
     val koinApplication = startKoin {
         modules(firestoreModule, raspberryPiModule)
+        environmentProperties()
     }
     val koin = koinApplication.koin
+
+    logger.info { "Started with id $id." }
 
     val raspberryPiService = koin.get<RaspberryPiService>()
     raspberryPiService.register(id)

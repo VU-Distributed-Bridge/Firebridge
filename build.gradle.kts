@@ -19,8 +19,9 @@ repositories {
 val firestoreVersion by extra("6.12.2")
 val koinVersion by extra("2.1.5")
 
-val logbackVersion by extra("1.2.3")
 val kotlinLoggingVersion by extra("1.7.9")
+val logbackVersion by extra("1.2.3")
+val googleCloudLoggingVersion by extra("0.116.0-alpha")
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -29,8 +30,9 @@ dependencies {
 
     implementation("org.koin:koin-core:$koinVersion")
 
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("com.google.cloud:google-cloud-logging-logback:${googleCloudLoggingVersion}")
 
     testImplementation("org.koin:koin-test:$koinVersion")
 }
