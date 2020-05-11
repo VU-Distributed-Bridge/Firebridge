@@ -1,5 +1,6 @@
 package com.github.frozensync.persistence.firestore
 
+import com.github.frozensync.GOOGLE_APPLICATION_CREDENTIALS
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.firestore.Firestore
 import com.google.firebase.FirebaseApp
@@ -27,7 +28,7 @@ class FirestoreFactory : KoinComponent {
     }
 
     private fun initializeDefaultFirebaseApp() {
-        val credentialsPath = getKoin().getProperty<String>("GOOGLE_APPLICATION_CREDENTIALS")!!
+        val credentialsPath = getKoin().getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS)!!
         val credentials = GoogleCredentials.fromStream(File(credentialsPath).inputStream())
         val options = FirebaseOptions.Builder()
             .setCredentials(credentials)
