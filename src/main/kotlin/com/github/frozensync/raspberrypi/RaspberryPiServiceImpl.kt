@@ -1,17 +1,24 @@
 package com.github.frozensync.raspberrypi
 
+import com.google.cloud.firestore.Firestore
 import mu.KotlinLogging
 import java.util.*
 
-class RaspberryPiServiceImpl(private val repository: RaspberryPiRepository) : RaspberryPiService {
+private const val RASPBERRY_PI_COLLECTION = "raspberryPis"
+
+class RaspberryPiServiceImpl(private val db: Firestore) : RaspberryPiService {
 
     private val logger = KotlinLogging.logger { }
 
     override fun register(id: UUID) {
         logger.entry(id)
 
-        val pi = RaspberryPi(id)
-        repository.save(pi)
+        val raspberryPi = RaspberryPi(id)
+        val data = mapOf("owned" to raspberryPi.owned)
+
+        db.collection(RASPBERRY_PI_COLLECTION)
+            .document(raspberryPi.id.toString())
+            .create(data)
 
         logger.exit()
     }
