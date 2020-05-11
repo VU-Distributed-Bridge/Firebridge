@@ -3,6 +3,9 @@ package com.github.frozensync
 import com.github.frozensync.persistence.firestore.firestoreModule
 import com.github.frozensync.raspberrypi.RaspberryPiService
 import com.github.frozensync.raspberrypi.raspberryPiModule
+import com.github.frozensync.tournament.Score
+import com.github.frozensync.tournament.TournamentService
+import com.github.frozensync.tournament.tournamentModule
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
 import java.util.*
@@ -13,7 +16,7 @@ private val logger = KotlinLogging.logger { }
 
 fun main() {
     val koinApplication = startKoin {
-        modules(firestoreModule, raspberryPiModule)
+        modules(firestoreModule, raspberryPiModule, tournamentModule)
         environmentProperties()
     }
     val koin = koinApplication.koin
@@ -32,7 +35,9 @@ fun main() {
     raspberryPiService.register(id)
 
     val scanner = Scanner(System.`in`)
+    val tournamentService = koin.get<TournamentService>()
     while (true) {
-        scanner.nextInt()
+        val score = Score(scanner.nextInt())
+        tournamentService.save(score)
     }
 }
