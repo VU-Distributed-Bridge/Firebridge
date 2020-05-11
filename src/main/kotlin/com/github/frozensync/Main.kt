@@ -6,6 +6,7 @@ import com.github.frozensync.raspberrypi.raspberryPiModule
 import com.github.frozensync.tournament.Score
 import com.github.frozensync.tournament.TournamentService
 import com.github.frozensync.tournament.tournamentModule
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
@@ -15,7 +16,7 @@ import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
 
-fun main() {
+fun main() = runBlocking {
     val koinApplication = startKoin {
         modules(firestoreModule, raspberryPiModule, tournamentModule)
         environmentProperties()

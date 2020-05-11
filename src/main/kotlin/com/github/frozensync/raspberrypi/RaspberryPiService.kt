@@ -10,5 +10,5 @@ interface RaspberryPiService {
     /**
      * Registers a new raspberry pi with given [id]. If it's already registered, fail silently.
      */
-    fun register(id: UUID)
+    suspend fun register(id: UUID)
 }

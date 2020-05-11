@@ -1,5 +1,6 @@
 package com.github.frozensync.raspberrypi
 
+import com.github.frozensync.persistence.firestore.retry
 import com.google.cloud.firestore.Firestore
 import mu.KotlinLogging
 import java.util.*
@@ -10,7 +11,7 @@ class RaspberryPiServiceImpl(private val db: Firestore) : RaspberryPiService {
 
     private val logger = KotlinLogging.logger { }
 
-    override fun register(id: UUID) {
+    override suspend fun register(id: UUID) {
         logger.entry(id)
 
         val raspberryPi = RaspberryPi(id)
