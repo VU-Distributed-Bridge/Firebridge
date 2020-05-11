@@ -23,7 +23,7 @@ fun main() {
     val koin = koinApplication.koin
     koin.assertProperties()
 
-    val id = UUID.fromString(koin.getProperty<String>("RASPBERRY_PI_ID"))
+    val id = UUID.fromString(koin.getProperty<String>(RASPBERRY_PI_ID))
     logger.info { "Started with id $id." }
 
     fixedRateTimer(name = "health-check", daemon = true, period = 20000L) { logger.info { "Health check: OK" } }
