@@ -27,7 +27,7 @@ fun main() = runBlocking {
     val id = UUID.fromString(koin.getProperty<String>(RASPBERRY_PI_ID))
     logger.info { "Started with id $id." }
 
-    fixedRateTimer(name = "health-check", daemon = true, period = 20000L) { logger.info { "Health check: OK" } }
+    fixedRateTimer(name = "health", daemon = true, period = 20000L) { logger.info { "Health check: OK" } }
 
     val raspberryPiService = koin.get<RaspberryPiService>()
     raspberryPiService.register(id)
