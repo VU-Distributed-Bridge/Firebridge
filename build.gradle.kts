@@ -16,15 +16,16 @@ repositories {
     jcenter()
 }
 
+val kotlinCoroutinesVersion by extra("1.3.5")
 val firestoreVersion by extra("6.12.2")
 val koinVersion by extra("2.1.5")
-
 val kotlinLoggingVersion by extra("1.7.9")
 val logbackVersion by extra("1.2.3")
 val googleCloudLoggingVersion by extra("0.116.0-alpha")
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
 
     implementation("com.google.firebase:firebase-admin:$firestoreVersion")
 
