@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    environment:
+      RASPBERRY_PI_ID: 881a7cf2-b2b5-4001-859d-a5fb1d1f79c2
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase_adminsdk
+    secrets:
+      - firebase_adminsdk
+
+secrets:
+  firebase_adminsdk:
+    file: firebase-adminsdk.json
