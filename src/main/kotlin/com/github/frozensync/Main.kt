@@ -21,8 +21,7 @@ fun main() = runBlocking {
         modules(firestoreModule, raspberryPiModule, tournamentModule)
         environmentProperties()
     }
-    val koin = koinApplication.koin
-    koin.assertProperties()
+    val koin = koinApplication.koin.assertProperties()
 
     val id = UUID.fromString(koin.getProperty<String>(RASPBERRY_PI_ID))
     logger.info { "Started with id $id." }
@@ -41,15 +40,25 @@ fun main() = runBlocking {
 }
 
 /**
- * Asserts required properties. Terminates application if any property is missing.
+ * Returns a valid [Koin] instance after asserting all required properties. Terminates the program if any required property is missing.
  */
-private fun Koin.assertProperties() {
+private fun Koin.assertProperties(): Koin {
+    val errorMessage = StringBuilder()
+    var isIllegalState = false
+
     if (getProperty<String>(RASPBERRY_PI_ID) == null) {
-        System.err.println("Missing environment variable: RASPBERRY_PI_ID")
-        exitProcess(1)
+        errorMessage.appendln("Missing environment variable: RASPBERRY_PI_ID")
+        isIllegalState = true
     }
     if (getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS) == null) {
-        System.err.println("Missing environment variable: GOOGLE_APPLICATION_CREDENTIALS")
+        errorMessage.appendln("Missing environment variable: GOOGLE_APPLICATION_CREDENTIALS")
+        isIllegalState = true
+    }
+
+    if (isIllegalState) {
+        System.err.println(errorMessage)
         exitProcess(1)
+    } else {
+        return this
     }
 }
