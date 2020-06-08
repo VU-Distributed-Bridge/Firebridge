@@ -20,6 +20,7 @@ repositories {
 
 val kotlinCoroutinesVersion by extra("1.3.5")
 val firestoreVersion by extra("6.12.2")
+val ktorVersion by extra("1.3.2")
 val koinVersion by extra("2.1.5")
 val kotlinLoggingVersion by extra("1.7.9")
 val logbackVersion by extra("1.2.3")
@@ -30,6 +31,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
 
     implementation("com.google.firebase:firebase-admin:$firestoreVersion")
+
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
 
     implementation("org.koin:koin-core:$koinVersion")
 
@@ -61,8 +64,5 @@ tasks {
             setPath("META-INF/services")
             include("io.grpc.*")
         }
-    }
-    withType<JavaExec> {
-        standardInput = System.`in`
     }
 }

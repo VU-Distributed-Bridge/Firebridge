@@ -3,9 +3,18 @@ package com.github.frozensync
 import com.github.frozensync.persistence.firestore.firestoreModule
 import com.github.frozensync.raspberrypi.RaspberryPiService
 import com.github.frozensync.raspberrypi.raspberryPiModule
-import com.github.frozensync.tournament.Score
-import com.github.frozensync.tournament.TournamentService
 import com.github.frozensync.tournament.tournamentModule
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.CallLogging
+import io.ktor.features.DefaultHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.routing
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.koin.core.Koin
@@ -15,7 +24,18 @@ import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
 
-fun main() = runBlocking {
+fun Application.module() {
+    install(DefaultHeaders)
+    install(CallLogging)
+
+    routing {
+        get("/health") {
+            call.respond(HttpStatusCode.OK)
+        }
+    }
+}
+
+fun main(): Unit = runBlocking {
     val koinApplication = startKoin {
         modules(firestoreModule, raspberryPiModule, tournamentModule)
         environmentProperties()
@@ -28,12 +48,8 @@ fun main() = runBlocking {
     val raspberryPiService = koin.get<RaspberryPiService>()
     raspberryPiService.register(id)
 
-    val scanner = Scanner(System.`in`)
-    val tournamentService = koin.get<TournamentService>()
-    while (true) {
-        val score = Score(scanner.nextInt())
-        tournamentService.save(score)
-    }
+    embeddedServer(Netty, 8080, module = Application::module).start()
+    return@runBlocking
 }
 
 /**
