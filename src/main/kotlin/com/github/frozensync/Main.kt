@@ -11,7 +11,6 @@ import mu.KotlinLogging
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
@@ -25,8 +24,6 @@ fun main() = runBlocking {
 
     val id = UUID.fromString(koin.getProperty<String>(RASPBERRY_PI_ID))
     logger.info { "Started with id $id." }
-
-    fixedRateTimer(name = "health", daemon = true, period = 20000L) { logger.info { "Health check: OK" } }
 
     val raspberryPiService = koin.get<RaspberryPiService>()
     raspberryPiService.register(id)
