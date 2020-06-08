@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     application
     kotlin("jvm") version "1.3.71"
@@ -52,6 +54,12 @@ tasks {
                     "Main-Class" to application.mainClassName
                 )
             )
+        }
+    }
+    withType<ShadowJar> {
+        mergeServiceFiles {
+            setPath("META-INF/services")
+            include("io.grpc.*")
         }
     }
     withType<JavaExec> {
