@@ -1,12 +1,21 @@
 package com.github.frozensync.persistence.firestore
 
 import com.google.api.gax.rpc.ApiException
+import com.google.cloud.firestore.Firestore
 import kotlinx.coroutines.delay
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger { }
 
-suspend fun <T> retry(
+/**
+ * Returns the result of RPC call [block] with exponential backoff on failure.
+ *
+ * If [block] throws an [ApiException], retries again after [initialDelay].
+ * Subsequent retries are delayed by a factor of [factor] with an upper limit of [maxDelay].
+ * After [times] retries, lets the thrown exception bubble upwards.
+ */
+@Suppress("unused")
+suspend fun <T> Firestore.retry(
     times: Int = Int.MAX_VALUE,
     initialDelay: Long = 500, // milliseconds
     maxDelay: Long = 30000, // milliseconds
