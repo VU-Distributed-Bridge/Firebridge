@@ -17,9 +17,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import org.koin.core.Koin
 import org.koin.core.context.startKoin
-import java.util.*
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
@@ -36,42 +34,20 @@ fun Application.module() {
 }
 
 fun main(): Unit = runBlocking {
-    val koinApplication = startKoin {
-        modules(firestoreModule, raspberryPiModule, tournamentModule)
+    val koin = startKoin {
+        modules(mainModule, firestoreModule, raspberryPiModule, tournamentModule)
         environmentProperties()
-    }
-    val koin = koinApplication.koin.assertProperties()
-
-    val id = UUID.fromString(koin.getProperty<String>(RASPBERRY_PI_ID))
-    logger.info { "Started with id $id." }
-
-    val raspberryPiService = koin.get<RaspberryPiService>()
-    raspberryPiService.register(id)
-
-    embeddedServer(Netty, 8080, module = Application::module).start()
-    return@runBlocking
-}
-
-/**
- * Returns a valid [Koin] instance after asserting all required properties. Terminates the program if any required property is missing.
- */
-private fun Koin.assertProperties(): Koin {
-    val errorMessage = StringBuilder()
-    var isIllegalState = false
-
-    if (getProperty<String>(RASPBERRY_PI_ID) == null) {
-        errorMessage.appendln("Missing environment variable: RASPBERRY_PI_ID")
-        isIllegalState = true
-    }
-    if (getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS) == null) {
-        errorMessage.appendln("Missing environment variable: GOOGLE_APPLICATION_CREDENTIALS")
-        isIllegalState = true
-    }
-
-    if (isIllegalState) {
+    }.koin
+    val errorMessage = koin.validateConfiguration()
+    if (errorMessage.isNotEmpty()) {
         System.err.println(errorMessage)
         exitProcess(1)
-    } else {
-        return this
     }
+
+    val raspberryPiService = koin.get<RaspberryPiService>()
+    raspberryPiService.register()
+
+    logger.info { "Started FireBridge" }
+    embeddedServer(Netty, 8080, module = Application::module).start()
+    return@runBlocking
 }

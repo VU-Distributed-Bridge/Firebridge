@@ -1,34 +1,20 @@
 package com.github.frozensync.persistence.firestore
 
-import com.github.frozensync.GOOGLE_APPLICATION_CREDENTIALS
+import com.github.frozensync.Configuration
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.firestore.Firestore
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.cloud.FirestoreClient
-import org.koin.core.KoinComponent
 import java.io.File
 
 /**
  * Factory which constructs [Firestore] instances.
  */
-class FirestoreFactory : KoinComponent {
+class FirestoreFactory(private val configuration: Configuration) {
 
-    private var initialized = false
-
-    /**
-     * Returns a [Firestore] instance associated with the default Firebase app. Always returns the same instance.
-     */
-    fun get(): Firestore {
-        if (!initialized) {
-            initializeDefaultFirebaseApp()
-            initialized = true
-        }
-        return FirestoreClient.getFirestore()
-    }
-
-    private fun initializeDefaultFirebaseApp() {
-        val credentialsPath = getKoin().getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS)!!
+    private val defaultFirebaseApp by lazy {
+        val credentialsPath = configuration.googleCredentialsPath
         val credentials = GoogleCredentials.fromStream(File(credentialsPath).inputStream())
         val options = FirebaseOptions.Builder()
             .setCredentials(credentials)
@@ -36,4 +22,9 @@ class FirestoreFactory : KoinComponent {
             .build()
         FirebaseApp.initializeApp(options)
     }
+
+    /**
+     * Returns a [Firestore] instance associated with the default Firebase app. Always returns the same instance.
+     */
+    fun get(): Firestore = FirestoreClient.getFirestore(defaultFirebaseApp)
 }

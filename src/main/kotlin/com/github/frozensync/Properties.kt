@@ -1,4 +1,0 @@
-package com.github.frozensync
-
-const val RASPBERRY_PI_ID = "RASPBERRY_PI_ID"
-const val GOOGLE_APPLICATION_CREDENTIALS = "GOOGLE_APPLICATION_CREDENTIALS"
