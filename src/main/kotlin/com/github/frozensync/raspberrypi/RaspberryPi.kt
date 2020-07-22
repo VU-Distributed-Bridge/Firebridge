@@ -1,5 +1,5 @@
 package com.github.frozensync.raspberrypi
 
-import java.util.*
+import com.github.frozensync.DeviceId
 
-data class RaspberryPi(val id: UUID, val owned: Boolean = false)
+data class RaspberryPi(val id: DeviceId, val owned: Boolean = false)
