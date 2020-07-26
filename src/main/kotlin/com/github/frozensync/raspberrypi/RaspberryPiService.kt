@@ -6,6 +6,11 @@ package com.github.frozensync.raspberrypi
 interface RaspberryPiService {
 
     /**
+     * Schedules a periodic health check with interval [delay] in milliseconds.
+     */
+    suspend fun scheduleHealthCheck(delay: Long = 20000L)
+
+    /**
      * Preregisters this device if not already preregistered.
      */
     suspend fun register()
