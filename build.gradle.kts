@@ -1,8 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
 
 plugins {
     application
     kotlin("jvm") version "1.3.71"
+    id("org.jetbrains.kotlin.plugin.noarg") version "1.3.71"
     id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
@@ -38,6 +40,10 @@ dependencies {
     implementation("com.google.cloud:google-cloud-logging-logback:${googleCloudLoggingVersion}")
 
     testImplementation("org.koin:koin-test:$koinVersion")
+}
+
+configure<NoArgExtension> {
+    annotation("com.github.frozensync.persistence.firestore.FirestoreDocument")
 }
 
 tasks {

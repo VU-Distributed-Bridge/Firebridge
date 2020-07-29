@@ -3,8 +3,13 @@ package com.github.frozensync
 import com.github.frozensync.persistence.firestore.firestoreModule
 import com.github.frozensync.raspberrypi.RaspberryPiService
 import com.github.frozensync.raspberrypi.raspberryPiModule
+import com.github.frozensync.tournament.TournamentService
 import com.github.frozensync.tournament.tournamentModule
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
@@ -28,5 +33,16 @@ fun main(): Unit = runBlocking {
     raspberryPiService.scheduleHealthCheck()
 
     logger.info { "Started FireBridge" }
+
+    val tournamentService = koin.get<TournamentService>()
+    tournamentService.listenForLiveTournaments()
+        .filter { it.isNotEmpty() }
+        .take(1)
+        .map { it[0] }
+        .collect {
+            logger.info { "Found a live tournament! Will start working for \"${it.name}\"." }
+        }
+
     delay(100000L)
+    logger.info { "Terminating FireBridge" }
 }
