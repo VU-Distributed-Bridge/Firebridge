@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.github.frozensync.tournament";
+option java_outer_classname = "TournamentScorerProto";
+
+package tournament;
+
+service Scorer {
+  rpc SendScore (ScoreRequest) returns (Empty) {}
+}
+
+message ScoreRequest {
+  int32 score = 1;
+}
+
+message Empty {}

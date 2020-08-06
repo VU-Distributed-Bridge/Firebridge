@@ -3,9 +3,9 @@ package com.github.frozensync
 import com.github.frozensync.persistence.firestore.firestoreModule
 import com.github.frozensync.raspberrypi.RaspberryPiService
 import com.github.frozensync.raspberrypi.raspberryPiModule
+import com.github.frozensync.tournament.ScorerServer
 import com.github.frozensync.tournament.TournamentService
 import com.github.frozensync.tournament.tournamentModule
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -43,6 +43,8 @@ fun main(): Unit = runBlocking {
             logger.info { "Found a live tournament! Will start working for \"${it.name}\"." }
         }
 
-    delay(100000L)
-    logger.info { "Terminating FireBridge" }
+    val server = koin.get<ScorerServer>()
+    server.start().blockUntilShutdown()
+
+    logger.info { "Shutdown FireBridge" }
 }
