@@ -7,6 +7,7 @@ typealias DeviceId = UUID
 
 private const val DEVICE_ID_KEY = "DEVICE_ID"
 private const val GOOGLE_APPLICATION_CREDENTIALS_KEY = "GOOGLE_APPLICATION_CREDENTIALS"
+private const val GRPC_SERVER_PORT = "GRPC_SERVER_PORT"
 
 fun Koin.validateConfiguration(): String {
     val errorMessage = StringBuilder()
@@ -24,4 +25,5 @@ fun Koin.validateConfiguration(): String {
 class Configuration(koin: Koin) {
     val deviceId = koin.getProperty<DeviceId>(DEVICE_ID_KEY)!!
     val googleCredentialsPath = koin.getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS_KEY)!!
+    val grpcServerPort = koin.getProperty<Int>(GRPC_SERVER_PORT) ?: 8980
 }
