@@ -1,4 +1,4 @@
-package com.github.frozensync.raspberrypi
+package com.github.frozensync.tournament.raspberrypi
 
 /**
  * Service containing business logic operations on [RaspberryPi]s.

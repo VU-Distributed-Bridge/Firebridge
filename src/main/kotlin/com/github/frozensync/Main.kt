@@ -1,10 +1,9 @@
 package com.github.frozensync
 
-import com.github.frozensync.persistence.firestore.firestoreModule
-import com.github.frozensync.raspberrypi.RaspberryPiService
-import com.github.frozensync.raspberrypi.raspberryPiModule
+import com.github.frozensync.database.firestoreModule
 import com.github.frozensync.tournament.ScorerServer
 import com.github.frozensync.tournament.TournamentService
+import com.github.frozensync.tournament.raspberrypi.RaspberryPiService
 import com.github.frozensync.tournament.tournamentModule
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
@@ -19,7 +18,7 @@ private val logger = KotlinLogging.logger { }
 
 fun main(): Unit = runBlocking {
     val koin = startKoin {
-        modules(mainModule, firestoreModule, raspberryPiModule, tournamentModule)
+        modules(mainModule, firestoreModule, tournamentModule)
         environmentProperties()
     }.koin
     val errorMessage = koin.validateConfiguration()

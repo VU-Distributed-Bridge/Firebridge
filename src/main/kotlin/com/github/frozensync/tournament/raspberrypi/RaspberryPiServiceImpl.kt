@@ -1,7 +1,7 @@
-package com.github.frozensync.raspberrypi
+package com.github.frozensync.tournament.raspberrypi
 
 import com.github.frozensync.Configuration
-import com.github.frozensync.persistence.firestore.retry
+import com.github.frozensync.database.retry
 import com.google.cloud.firestore.FieldValue
 import com.google.cloud.firestore.Firestore
 import kotlinx.coroutines.*
