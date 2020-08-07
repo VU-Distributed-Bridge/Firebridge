@@ -5,9 +5,9 @@ import org.jetbrains.kotlin.noarg.gradle.NoArgExtension
 plugins {
     idea
     application
-    kotlin("jvm") version "1.3.71"
-    id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.jetbrains.kotlin.plugin.noarg") version "1.3.71"
+    kotlin("jvm") version "1.3.72"
+    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("org.jetbrains.kotlin.plugin.noarg") version "1.3.72"
     id("com.google.protobuf") version "0.8.12"
 }
 
@@ -23,15 +23,15 @@ repositories {
     jcenter()
 }
 
-val kotlinCoroutinesVersion by extra("1.3.5")
-val firestoreVersion by extra("6.12.2")
-val koinVersion by extra("2.1.5")
-val grpcVersion = "1.30.0"
-val grpcKotlinVersion = "0.1.3"
-val protobufVersion = "3.12.2"
-val kotlinLoggingVersion by extra("1.7.9")
+val kotlinCoroutinesVersion by extra("1.3.8")
+val firestoreVersion by extra("6.15.0")
+val koinVersion by extra("2.1.6")
+val grpcVersion = "1.31.0"
+val grpcKotlinVersion = "0.1.4"
+val protobufVersion = "3.12.4"
+val kotlinLoggingVersion by extra("1.8.3")
 val logbackVersion by extra("1.2.3")
-val googleCloudLoggingVersion by extra("0.116.0-alpha")
+val googleCloudLoggingVersion by extra("0.118.1-alpha")
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
