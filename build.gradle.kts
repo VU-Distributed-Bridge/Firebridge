@@ -78,7 +78,7 @@ protobuf {
 
 
 configure<NoArgExtension> {
-    annotation("com.github.frozensync.persistence.firestore.FirestoreDocument")
+    annotation("com.github.frozensync.database.FirestoreDocument")
 }
 
 tasks {
