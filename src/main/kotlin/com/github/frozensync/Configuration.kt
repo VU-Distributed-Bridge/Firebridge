@@ -1,6 +1,7 @@
 package com.github.frozensync
 
 import org.koin.core.Koin
+import org.koin.ext.getIntProperty
 import java.util.*
 
 typealias DeviceId = UUID
@@ -12,18 +13,26 @@ private const val GRPC_SERVER_PORT = "GRPC_SERVER_PORT"
 fun Koin.validateConfiguration(): String {
     val errorMessage = StringBuilder()
 
-    getProperty<String>(DEVICE_ID_KEY)
-        ?.let { this.setProperty("DEVICE_ID", DeviceId.fromString(it)) }
+    getProperty(DEVICE_ID_KEY)
+        ?.run {
+            try {
+                DeviceId.fromString(this)
+            } catch (e: IllegalArgumentException) {
+                errorMessage.appendln("DEVICE_ID does not conform to a UUID")
+            }
+        }
         ?: errorMessage.appendln("Missing environment variable: DEVICE_ID")
 
-    getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS_KEY)
+    getProperty(GOOGLE_APPLICATION_CREDENTIALS_KEY)
         ?: errorMessage.appendln("Missing environment variable: GOOGLE_APPLICATION_CREDENTIALS")
 
     return errorMessage.toString()
 }
 
 class Configuration(koin: Koin) {
-    val deviceId = koin.getProperty<DeviceId>(DEVICE_ID_KEY)!!
-    val googleCredentialsPath = koin.getProperty<String>(GOOGLE_APPLICATION_CREDENTIALS_KEY)!!
-    val grpcServerPort = koin.getProperty<Int>(GRPC_SERVER_PORT) ?: 8980
+    val deviceId = koin.getDeviceIdProperty(DEVICE_ID_KEY)!!
+    val googleCredentialsPath = koin.getProperty(GOOGLE_APPLICATION_CREDENTIALS_KEY)!!
+    val grpcServerPort = koin.getIntProperty(GRPC_SERVER_PORT) ?: 8980
 }
+
+private fun Koin.getDeviceIdProperty(key: String) = getProperty(key)?.let { DeviceId.fromString(it) }
