@@ -1,4 +1,4 @@
-package com.github.frozensync.persistence.firestore
+package com.github.frozensync.database
 
 import org.koin.dsl.module
 

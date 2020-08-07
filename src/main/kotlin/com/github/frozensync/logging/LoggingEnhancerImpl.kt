@@ -1,4 +1,4 @@
-package com.github.frozensync.logging.googlecloud
+package com.github.frozensync.logging
 
 import com.github.frozensync.Configuration
 import com.google.cloud.logging.LogEntry

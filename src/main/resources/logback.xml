@@ -26,7 +26,7 @@
         </filter>
         <log>firebridge.log</log>
         <resourceType>global</resourceType>
-        <enhancer>com.github.frozensync.logging.googlecloud.LoggingEnhancerImpl</enhancer>
+        <enhancer>com.github.frozensync.logging.LoggingEnhancerImpl</enhancer>
         <flushLevel>INFO</flushLevel>
     </appender>
 

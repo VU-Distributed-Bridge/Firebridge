@@ -1,4 +1,4 @@
-package com.github.frozensync.persistence.firestore
+package com.github.frozensync.database
 
 import com.google.api.gax.rpc.ApiException
 import com.google.cloud.firestore.Firestore

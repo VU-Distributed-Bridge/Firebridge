@@ -1,4 +1,4 @@
-package com.github.frozensync.persistence.firestore
+package com.github.frozensync.database
 
 import com.github.frozensync.Configuration
 import com.google.auth.oauth2.GoogleCredentials

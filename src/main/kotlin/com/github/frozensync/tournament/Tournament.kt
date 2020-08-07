@@ -1,6 +1,6 @@
 package com.github.frozensync.tournament
 
-import com.github.frozensync.persistence.firestore.FirestoreDocument
+import com.github.frozensync.database.FirestoreDocument
 import java.util.*
 
 @FirestoreDocument
