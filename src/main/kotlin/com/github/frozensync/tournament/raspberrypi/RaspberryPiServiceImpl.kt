@@ -18,7 +18,6 @@ class RaspberryPiServiceImpl(private val configuration: Configuration, private v
 
     private var healthCheckJob: Job? = null
 
-    @ExperimentalCoroutinesApi
     @ObsoleteCoroutinesApi // see https://github.com/Kotlin/kotlinx.coroutines/issues/540
     override suspend fun scheduleHealthCheck(delay: Long) {
         healthCheckJob?.cancel()
