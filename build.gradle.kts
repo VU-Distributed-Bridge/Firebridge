@@ -84,6 +84,7 @@ configure<NoArgExtension> {
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "11"
+        kotlinOptions.freeCompilerArgs = listOf("-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "11"
