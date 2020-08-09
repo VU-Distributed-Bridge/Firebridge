@@ -1,6 +1,7 @@
 package com.github.frozensync.tournament
 
 import com.github.frozensync.DeviceId
+import com.github.frozensync.database.retry
 import com.google.cloud.firestore.Firestore
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -37,30 +38,14 @@ class TournamentServiceImpl(private val db: Firestore) : TournamentService {
         return result
     }
 
-    override fun save(score: Score) {
-        logger.entry(score)
+    override suspend fun saveScore(score: Score, directorId: String, tournamentId: String) {
+        logger.entry(score, directorId, tournamentId)
 
-        val deviceId = configuration.deviceId.toString()
-        val scoreAsMap = mapOf("result" to score.result)
-
-        db.runTransaction { transaction ->
-            val assignmentRef = db.collection("tournamentAssignments").document(deviceId)
-            val assignment = transaction.get(assignmentRef).get()
-            val tournamentId = assignment.getString("tournamentId") ?: return@runTransaction
-
-            val serverRef = db.collection("tournaments").document(tournamentId)
-                .collection("servers").document(deviceId)
-            val server = transaction.get(serverRef).get()
-
-            if (server.exists()) {
-                @Suppress("UNCHECKED_CAST") val scores = server.get("scores") as MutableList<Map<String, Int>>
-                scores.add(scoreAsMap)
-
-                transaction.update(serverRef, "scores", scores)
-            } else {
-                val data = mapOf("scores" to listOf(scoreAsMap))
-                transaction.set(serverRef, data)
-            }
+        db.retry {
+            @Suppress("BlockingMethodInNonBlockingContext")
+            collection("directors/$directorId/tournaments/$tournamentId/scores")
+                .add(score)
+                .get()
         }
 
         logger.exit()

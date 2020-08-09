@@ -2,6 +2,7 @@ package com.github.frozensync
 
 import com.github.frozensync.database.firestoreModule
 import com.github.frozensync.tournament.ScorerServer
+import com.github.frozensync.tournament.ScorerService
 import com.github.frozensync.tournament.TournamentService
 import com.github.frozensync.tournament.raspberrypi.RaspberryPiService
 import com.github.frozensync.tournament.tournamentModule
@@ -41,8 +42,7 @@ fun main(): Unit = runBlocking {
     val tournament = tournamentService.getLiveTournamentAsync(directorId, deviceId).await()
     logger.info { "Found a live tournament! Will start working for \"${tournament.name}\"" }
 
-    val server = koin.get<ScorerServer>()
-    server.start().blockUntilShutdown()
-
-    logger.info { "Shutdown FireBridge" }
+    val scorerService = ScorerService(tournamentService, directorId, tournament.id)
+    val grpcServer = ScorerServer(configuration.grpcServerPort, scorerService)
+    grpcServer.start().blockUntilShutdown()
 }

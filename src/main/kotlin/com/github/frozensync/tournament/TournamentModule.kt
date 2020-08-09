@@ -7,7 +7,4 @@ import org.koin.dsl.module
 val tournamentModule = module {
     single<TournamentService> { TournamentServiceImpl(get()) }
     single<RaspberryPiService> { RaspberryPiServiceImpl(get(), get()) }
-
-    single { ScorerService(get()) }
-    single { ScorerServer(get(), get()) }
 }

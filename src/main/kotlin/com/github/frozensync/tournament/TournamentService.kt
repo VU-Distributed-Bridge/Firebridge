@@ -10,5 +10,8 @@ interface TournamentService {
      */
     suspend fun getLiveTournamentAsync(directorId: String, deviceId: DeviceId): Deferred<Tournament>
 
-    fun save(score: Score)
+    /**
+     * Adds a [score] for tournament [tournamentId] by director [directorId].
+     */
+    suspend fun saveScore(score: Score, directorId: String, tournamentId: String)
 }
