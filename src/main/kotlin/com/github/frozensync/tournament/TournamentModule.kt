@@ -5,8 +5,7 @@ import com.github.frozensync.tournament.raspberrypi.RaspberryPiServiceImpl
 import org.koin.dsl.module
 
 val tournamentModule = module {
-    single<TournamentService> { TournamentServiceImpl(get(), get()) }
-
+    single<TournamentService> { TournamentServiceImpl(get()) }
     single<RaspberryPiService> { RaspberryPiServiceImpl(get(), get()) }
 
     single { ScorerService(get()) }

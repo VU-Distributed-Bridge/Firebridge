@@ -5,10 +5,6 @@ import com.github.frozensync.tournament.ScorerServer
 import com.github.frozensync.tournament.TournamentService
 import com.github.frozensync.tournament.raspberrypi.RaspberryPiService
 import com.github.frozensync.tournament.tournamentModule
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
@@ -27,20 +23,23 @@ fun main(): Unit = runBlocking {
         exitProcess(1)
     }
 
-    val raspberryPiService = koin.get<RaspberryPiService>()
-    raspberryPiService.register()
-    raspberryPiService.scheduleHealthCheck()
-
     logger.info { "Started FireBridge" }
 
+    val configuration = koin.get<Configuration>()
+    val deviceId = configuration.deviceId
+
+    val raspberryPiService = koin.get<RaspberryPiService>()
+    raspberryPiService.register(deviceId)
+    raspberryPiService.scheduleHealthCheck()
+
+    logger.info { "Waiting for device to be claimed by an owner..." }
+    val directorId = raspberryPiService.getOwnerIdAsync(deviceId).await()
+    logger.info { "Device is claimed by owner $directorId" }
+
     val tournamentService = koin.get<TournamentService>()
-    tournamentService.listenForLiveTournaments()
-        .filter { it.isNotEmpty() }
-        .take(1)
-        .map { it[0] }
-        .collect {
-            logger.info { "Found a live tournament! Will start working for \"${it.name}\"." }
-        }
+    logger.info { "Waiting for a tournament to go live..." }
+    val tournament = tournamentService.getLiveTournamentAsync(directorId, deviceId).await()
+    logger.info { "Found a live tournament! Will start working for \"${tournament.name}\"" }
 
     val server = koin.get<ScorerServer>()
     server.start().blockUntilShutdown()
