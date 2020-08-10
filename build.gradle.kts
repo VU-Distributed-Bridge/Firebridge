@@ -105,3 +105,20 @@ tasks {
         }
     }
 }
+
+tasks.register<JavaExec>("ControlProgramMockServer") {
+    dependsOn("classes")
+    classpath = sourceSets["main"].runtimeClasspath
+    main = "com.github.frozensync.tournament.ControlProgramMockServerKt"
+}
+
+val controlProgramMockServerStartScripts = tasks.register<CreateStartScripts>("controlProgramMockServerStartScripts") {
+    mainClassName = "com.github.frozensync.tournament.ControlProgramMockServerKt"
+    applicationName = "control-program-mock-server"
+    outputDir = tasks.named<CreateStartScripts>("startScripts").get().outputDir
+    classpath = tasks.named<CreateStartScripts>("startScripts").get().classpath
+}
+
+tasks.named("startScripts") {
+    dependsOn(controlProgramMockServerStartScripts)
+}
