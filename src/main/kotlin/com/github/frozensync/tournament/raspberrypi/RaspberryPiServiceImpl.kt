@@ -10,7 +10,11 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.ticker
 import mu.KotlinLogging
 
-class RaspberryPiServiceImpl(private val configuration: Configuration, private val db: Firestore) : RaspberryPiService {
+class RaspberryPiServiceImpl(
+    private val configuration: Configuration,
+    private val db: Firestore,
+    private val healthStatistics: DeviceHealthStatistics
+) : RaspberryPiService {
 
     private val logger = KotlinLogging.logger { }
 
@@ -69,7 +73,10 @@ class RaspberryPiServiceImpl(private val configuration: Configuration, private v
         healthCheckJob?.cancel()
         healthCheckJob = GlobalScope.launch {
             ticker(delay).consumeEach {
-                selfRef.update("healthCheck.latestPing", FieldValue.serverTimestamp()).get()
+                selfRef.update(
+                    "healthCheck.latestPing", FieldValue.serverTimestamp(),
+                    "healthCheck.amountOfScores", healthStatistics.amountOfScores
+                ).get()
             }
         }
 
