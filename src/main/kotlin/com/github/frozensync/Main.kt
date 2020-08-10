@@ -1,11 +1,12 @@
 package com.github.frozensync
 
 import com.github.frozensync.database.firestoreModule
-import com.github.frozensync.tournament.ScorerServer
-import com.github.frozensync.tournament.ScorerService
-import com.github.frozensync.tournament.TournamentService
+import com.github.frozensync.tournament.*
 import com.github.frozensync.tournament.raspberrypi.RaspberryPiService
-import com.github.frozensync.tournament.tournamentModule
+import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
@@ -42,7 +43,22 @@ fun main(): Unit = runBlocking {
     val tournament = tournamentService.getLiveTournamentAsync(directorId, deviceId).await()
     logger.info { "Found a live tournament! Will start working for \"${tournament.name}\"" }
 
-    val scorerService = ScorerService(tournamentService, directorId, tournament.id)
-    val grpcServer = ScorerServer(configuration.grpcServerPort, scorerService)
-    grpcServer.start().blockUntilShutdown()
+    val assignment = tournament.assignedRaspberryPis.map { Assignment(it) }.first { it.id == deviceId.toString() }
+    if (assignment.role == "slave") {
+        val scorerService = ScorerService(tournamentService, directorId, tournament.id)
+        val grpcServer = ScorerServer(configuration.grpcServerPort, scorerService)
+        grpcServer.start().blockUntilShutdown()
+    } else { // master
+        val controlProgramClient = ControlProgramClient(
+            ManagedChannelBuilder.forAddress("localhost", 8981)
+                .usePlaintext()
+                .executor(Dispatchers.Default.asExecutor())
+                .build()
+        )
+        tournamentService.streamScores(directorId, tournament.id)
+            .collect {
+                logger.debug { it }
+                controlProgramClient.sendScore(it)
+            }
+    }
 }

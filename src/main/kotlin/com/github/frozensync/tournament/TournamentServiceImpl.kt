@@ -2,9 +2,14 @@ package com.github.frozensync.tournament
 
 import com.github.frozensync.DeviceId
 import com.github.frozensync.database.retry
+import com.google.cloud.firestore.DocumentChange
 import com.google.cloud.firestore.Firestore
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.sendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import mu.KotlinLogging
 
 class TournamentServiceImpl(private val db: Firestore) : TournamentService {
@@ -36,6 +41,28 @@ class TournamentServiceImpl(private val db: Firestore) : TournamentService {
 
         logger.exit()
         return result
+    }
+
+    override suspend fun streamScores(directorId: String, tournamentId: String): Flow<Score> {
+        logger.entry(directorId, tournamentId)
+
+        val flow = callbackFlow<Score> {
+            val listener = db.collection("directors/$directorId/tournaments/$tournamentId/scores")
+                .addSnapshotListener listener@{ snapshots, error ->
+                    if (error != null) return@listener logger.catching(error)
+
+                    snapshots!!.documentChanges
+                        .filter { it.type == DocumentChange.Type.ADDED }
+                        .forEach {
+                            val score = Score(it.document["result"] as Long)
+                            sendBlocking(score)
+                        }
+                }
+            awaitClose { listener.remove() }
+        }
+
+        logger.exit()
+        return flow
     }
 
     override suspend fun saveScore(score: Score, directorId: String, tournamentId: String) {
