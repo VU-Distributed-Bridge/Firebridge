@@ -2,6 +2,7 @@ package com.github.frozensync.tournament
 
 import com.github.frozensync.DeviceId
 import com.github.frozensync.database.retry
+import com.github.frozensync.tournament.raspberrypi.DeviceHealthStatistics
 import com.google.cloud.firestore.DocumentChange
 import com.google.cloud.firestore.Firestore
 import kotlinx.coroutines.CompletableDeferred
@@ -12,7 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import mu.KotlinLogging
 
-class TournamentServiceImpl(private val db: Firestore) : TournamentService {
+class TournamentServiceImpl(
+    private val db: Firestore,
+    private val healthStatistics: DeviceHealthStatistics
+) : TournamentService {
 
     private val logger = KotlinLogging.logger { }
 
@@ -74,6 +78,7 @@ class TournamentServiceImpl(private val db: Firestore) : TournamentService {
                 .add(score)
                 .get()
         }
+        healthStatistics.amountOfScores += 1L
 
         logger.exit()
     }
