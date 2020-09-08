@@ -9,4 +9,22 @@ class DeviceHealthStatistics(private val map: MutableMap<String, Any?> = Concurr
         set(value) {
             map["amountOfScores"] = value
         }
+
+    var batteryPercentage: Long?
+        get() = map.getOrDefault("batteryPercentage", null) as Long?
+        set(value) {
+            map["batteryPercentage"] = value
+        }
+
+    var region: String?
+        get() = map.getOrDefault("region", null) as String?
+        set(value) {
+            map["region"] = value
+        }
+
+    var channel: Long?
+        get() = map.getOrDefault("channel", null) as Long?
+        set(value) {
+            map["channel"] = value
+        }
 }

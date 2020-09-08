@@ -1,8 +1,13 @@
 package com.github.frozensync
 
 import com.github.frozensync.database.firestoreModule
-import com.github.frozensync.tournament.*
+import com.github.frozensync.tournament.Assignment
+import com.github.frozensync.tournament.ControlProgramClient
+import com.github.frozensync.tournament.TournamentService
+import com.github.frozensync.tournament.raspberrypi.FirebridgeGrpcServer
+import com.github.frozensync.tournament.raspberrypi.FirebridgeGrpcService
 import com.github.frozensync.tournament.raspberrypi.RaspberryPiService
+import com.github.frozensync.tournament.tournamentModule
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -43,11 +48,13 @@ fun main(): Unit = runBlocking {
     val tournament = tournamentService.getLiveTournamentAsync(directorId, deviceId).await()
     logger.info { "Found a live tournament! Will start working for \"${tournament.name}\"" }
 
-    val assignment = tournament.assignedRaspberryPis.map { Assignment(it) }.first { it.id == deviceId.toString() }
+    val assignment = tournament.assignedRaspberryPis
+        .map { Assignment(it) }
+        .first { it.id == deviceId.toString() }
     if (assignment.role == "slave") {
-        val scorerService = ScorerService(tournamentService, directorId, tournament.id)
-        val grpcServer = ScorerServer(configuration.grpcServerPort, scorerService)
-        grpcServer.start().blockUntilShutdown()
+        val firebridgeGrpcService = FirebridgeGrpcService(tournamentService, directorId, tournament.id, koin.get())
+        val firebridgeGrpcServer = FirebridgeGrpcServer(configuration.grpcServerPort, firebridgeGrpcService)
+        firebridgeGrpcServer.start().blockUntilShutdown()
     } else { // master
         val controlProgramClient = ControlProgramClient(
             ManagedChannelBuilder.forAddress("localhost", 8981)
