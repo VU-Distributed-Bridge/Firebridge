@@ -58,7 +58,15 @@ class TournamentServiceImpl(
                     snapshots!!.documentChanges
                         .filter { it.type == DocumentChange.Type.ADDED }
                         .forEach {
-                            val score = Score(it.document["result"] as Long)
+                            val score = Score(
+                                round = it.document["round"] as Long,
+                                NS = it.document["NS"] as Long,
+                                EW = it.document["EW"] as Long,
+                                board = it.document["board"] as Long,
+                                contr = it.document["contr"] as String,
+                                lead = it.document["lead"] as String,
+                                result = it.document["result"] as Long
+                            )
                             sendBlocking(score)
                         }
                 }
