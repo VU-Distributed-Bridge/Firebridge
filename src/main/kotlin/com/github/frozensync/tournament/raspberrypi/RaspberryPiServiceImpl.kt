@@ -75,7 +75,10 @@ class RaspberryPiServiceImpl(
             ticker(delay).consumeEach {
                 selfRef.update(
                     "healthCheck.latestPing", FieldValue.serverTimestamp(),
-                    "healthCheck.amountOfScores", healthStatistics.amountOfScores
+                    "healthCheck.amountOfScores", healthStatistics.amountOfScores,
+                    "healthCheck.batteryPercentage", healthStatistics.batteryPercentage,
+                    "healthCheck.region", healthStatistics.region,
+                    "healthCheck.channel", healthStatistics.channel
                 ).get()
             }
         }
